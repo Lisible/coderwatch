@@ -1,3 +1,4 @@
+
 ;;; coderwatch.el --- Allow Coderwatch support for emacs
 ;; Author: Lisible
 ;; Created: 27 Sep 2020
@@ -7,9 +8,8 @@
 ;; This Emacs plugin allows you to use Emacs with Coderwatch.
 
 ;;; Code:
-
 (require 'files)
-(locate-dominating-file (buffer-file-name) ".coderwatch")
+(require 'request)
 
 (define-minor-mode coderwatch-mode
   "Global minor mode for coderwatch"
@@ -28,9 +28,13 @@
 (defconst coderwatch-project-file-name ".coderwatch")
 
 (defun coderwatch-enable ()
-  (message (coderwatch-get-project-file-path)))
+  (setq coderwatch-update-timer (run-with-timer 0 10 'coderwatch-send-status-update)))
 
-(defun coderwatch-disable () ())
+(defun coderwatch-disable ()
+  (cancel-timer coderwatch-update-timer))
+
+(defun coderwatch-send-status-update ()
+  (request "http://localhost:8000/"))
 
 (defun coderwatch-get-project-file-path ()
   (concat
